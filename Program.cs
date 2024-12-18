@@ -15,27 +15,58 @@ String URLString = "http://localhost:8080/v1/common/sitemap-deals";
 var reader = XmlReader.Create(URLString);
 
 Util u = new Util();
-u.WriteToCSV();
-// while (reader.Read())
-// {
-//     if (reader.Name.Equals("loc"))
-//     {
-//         reader.Read();
-//         if (reader.NodeType == XmlNodeType.Text)
-//         {
-//             await u.MakeRequest(reader.Value);
-//         }
-//     }
-// }
+
+u.Dump("-----------Starting the process -----------");
+
+
+while (reader.Read())
+{
+    if (reader.Name.Equals("loc"))
+    {
+        reader.Read();
+        if (reader.NodeType == XmlNodeType.Text)
+        {
+            await u.MakeRequest(reader.Value);
+        }
+    }
+}
+
+
+public struct Record
+{
+    public string URL { get; set; }
+
+    public string Status { get; set; }
+    public int StatusCode { get; set; }
+    public string Message { get; set; }
+
+
+    public Record(string url, string status, int statusCode, string message)
+    {
+        URL = url;
+        Status = status;
+        StatusCode = statusCode;
+        Message = message;
+    }
+}
 
 
 public class Util
 {
     private HttpClient _httpClient;
+    private TextWriter _writer;
+    private CsvWriter _csvWriter;
+
+    private const string OutputFile = "output.csv";
+    private const string OK = "OK";
+    private const string NOT_OK = "NOT_OK";
 
     public Util()
     {
         this._httpClient = new HttpClient();
+        this._writer = new StreamWriter(OutputFile, false, System.Text.Encoding.UTF8);
+        this._csvWriter = new CsvWriter(this._writer, CultureInfo.InvariantCulture);
+        this._csvWriter.WriteHeader<Record>();
     }
 
     public void Dump(object obj)
@@ -54,29 +85,24 @@ public class Util
         try
         {
             HttpResponseMessage response = await _httpClient.GetAsync(url);
-            Dump(response.StatusCode);
+            Record rec = new Record(url, OK, (int)response.StatusCode, "");
+            OutputResult(rec);
         }
         catch (HttpRequestException ex)
         {
-            Dump(ex.Message);
+            int statusCode = ex.StatusCode != null ? Convert.ToInt32(ex.StatusCode) : 400;
+            Record rec = new Record(url, NOT_OK, statusCode, ex.Message);
+            OutputResult(rec);
         }
-
     }
 
-    public void WriteToCSV()
+    public void OutputResult(Record r)
     {
-        using (var writer = new StreamWriter("hello.csv", false, System.Text.Encoding.UTF8))
-        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+        if (r.Status.Equals(NOT_OK))
         {
-            var randomObject = new
-            {
-                Id = 1,
-                Name = "John Doe",
-                Age = 25,
-                Email = "johndoe@example.com"
-            };
-
-            csv.WriteRecord(randomObject);
+            this._csvWriter.NextRecord();
+            this._csvWriter.WriteRecord(r);
         }
+        Dump($"{r.Status}: URL: {r.URL}");
     }
 }
