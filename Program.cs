@@ -4,8 +4,8 @@ using System.Xml;
 
 class SitmapValidator
 {
-    private static string urlString = "http://localhost:8080/v1/common/sitemap-deals";
-    private static int batchSize = 20;
+    private static string _urlString = "http://localhost:8080/v1/common/sitemap-deals";
+    private static int _batchSize = 20;
 
     /// <summary>
     /// The function `RequestUrlsAsync` asynchronously requests a URL using a `SitemapReqClient` and
@@ -33,7 +33,7 @@ class SitmapValidator
     private static async Task<List<string>> LoadUrlsAsync()
     {
         var urls = new List<string>();
-        using (var reader = XmlReader.Create(urlString, new XmlReaderSettings { Async = true }))
+        using (var reader = XmlReader.Create(_urlString, new XmlReaderSettings { Async = true }))
         {
             while (await reader.ReadAsync())
             {
@@ -74,9 +74,9 @@ class SitmapValidator
     {
         var watch = Stopwatch.StartNew();
         var urls = await LoadUrlsAsync();
-        var output = new Output(new SitemapResponse());
+        var output = new Output();
 
-        foreach (var batch in GetBatches(urls, batchSize))
+        foreach (var batch in GetBatches(urls, _batchSize))
         {
             var tasks = batch.Select(url => RequestUrlsAsync(url));
             SitemapResponse[] responses = await Task.WhenAll(tasks);

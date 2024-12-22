@@ -5,8 +5,7 @@ public static class Util
 
     public static void Dump(object obj)
     {
-        string json = JsonSerializer.Serialize(obj);
-        Console.WriteLine(json);
+        Console.WriteLine(JsonSerializer.Serialize(obj));
     }
 
     public static void Dump(string str)

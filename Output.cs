@@ -5,19 +5,19 @@ public class Output
 {
     private TextWriter _writer;
     private CsvWriter _csvWriter;
-    private const string OutputFile = "output.csv";
+    private const string _outputFile = "output.csv";
 
-    public Output(SitemapResponse res)
+    public Output()
     {
-        this._writer = new StreamWriter(OutputFile, false, System.Text.Encoding.UTF8);
-        this._csvWriter = new CsvWriter(this._writer, CultureInfo.InvariantCulture);
-        this._csvWriter.WriteHeader<SitemapResponse>();
+        _writer = new StreamWriter(_outputFile, false, System.Text.Encoding.UTF8);
+        _csvWriter = new CsvWriter(_writer, CultureInfo.InvariantCulture);
+        _csvWriter.WriteHeader<SitemapResponse>();
     }
 
     public void AddRecord(SitemapResponse res)
     {
-        this._csvWriter.NextRecord();
-        this._csvWriter.WriteRecord(res);
+        _csvWriter.NextRecord();
+        _csvWriter.WriteRecord(res);
     }
 
     public void Log(SitemapResponse res)

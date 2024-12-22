@@ -2,7 +2,7 @@ public class SitemapReqClient
 {
     private HttpClient _httpClient;
     public static string OK = "OK";
-    public static string NOT_OK = "NOT_OK";
+    public static string NOT_OK = "NOTOK";
 
     public SitemapReqClient()
     {
