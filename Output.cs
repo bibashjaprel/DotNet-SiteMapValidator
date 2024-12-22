@@ -25,4 +25,9 @@ public class Output
         Util.Dump($"{res.Status}: URL: {res.URL}");
     }
 
+    public void Log(string message)
+    {
+        Util.Dump(message);
+    }
+
 }

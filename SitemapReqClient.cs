@@ -1,12 +1,12 @@
 public class SitemapReqClient
 {
     private HttpClient _httpClient;
-    public string OK = "OK";
-    public string NOT_OK = "NOT_OK";
+    public static string OK = "OK";
+    public static string NOT_OK = "NOT_OK";
 
     public SitemapReqClient()
     {
-        this._httpClient = new HttpClient();
+        _httpClient = new HttpClient();
     }
 
     public async Task<SitemapResponse> Get(string url)
